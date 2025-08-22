@@ -1,0 +1,7 @@
+setup.py
+crystaldatabase/__init__.py
+crystaldatabase/database.py
+crystaldatabase.egg-info/PKG-INFO
+crystaldatabase.egg-info/SOURCES.txt
+crystaldatabase.egg-info/dependency_links.txt
+crystaldatabase.egg-info/top_level.txt

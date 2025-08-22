@@ -16,7 +16,7 @@ class CrystalData(ABC):
         """
         Return optical axiality ('isotropic', 'uniaxial', 'biaxial') based on self.system
         """
-        system = self.system.lower()
+        system = self.crystal_system.lower()
         if system in {"cubic"}:
             return "isotropic"
         elif system in {"tetragonal", "hexagonal", "trigonal", "rhombohedral"}:
@@ -68,7 +68,7 @@ class CrystalData(ABC):
                 n_eff = n_o*n_e / np.sqrt((n_o**2)*(np.sin(theta)**2) + (n_e**2)*(np.cos(theta)**2))
                 return n_eff
             else:
-                raise ValueError(f"Polarization has to be 'o/e' or degree from optic axis: {polarization}")
+                raise ValueError(f"Polarization for uniaxial crystal has to be 'o/e' or degree from optic axis: {polarization}")
 
         elif self.axiality == "biaxial":
             coeff_a = self.sellmeier["a"]
@@ -96,7 +96,7 @@ class CrystalData(ABC):
 class LiNbO3(CrystalData):
     def __init__(self):
         self.name = "LiNbO3"
-        self.crystal_system = "triagonal"
+        self.crystal_system = "trigonal"
         self.axiality = self.get_axiality()
         self.point_group = "3m"
         d_15, d_22, d_31, d_33 = symbols("d_15 d_22 d_31 d_33")
@@ -110,7 +110,7 @@ class LiNbO3(CrystalData):
             [d_31, d_31, d_33, 0, 0, 0]
         ])
 
-        self.sellmeier = {"o" : [1, 2.6734, 0.001764, 1.2290, 0.05914, 474.60],
+        self.sellmeier = {"o" : [1, 2.6734, 0.001764, 1.2290, 0.05914, 12.614, 474.60],
                           "e" : [1, 2.9804, 0.02047, 0.5981, 0.0666, 8.9543, 416.08], 
                           "range" : [0.4, 5.0]}
         
@@ -118,7 +118,7 @@ class LiNbO3(CrystalData):
                           "refractive_index": "https://refractiveindex.info/?shelf=main&book=LiNbO3&page=Zelmon-o"
         }
         
-    def _sellmeier_eq(wavelength_um, coefficient, polarization="independent"):
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
         wvl = wavelength_um
         coeff = coefficient
         n_squared = coeff[0] + \
@@ -154,7 +154,7 @@ class BaMgF4(CrystalData):
                           "refractive_index": "https://doi.org/10.1364/OE.17.012362"
         }
         
-    def _sellmeier_eq(wavelength_um, coefficient, polarization="independent"):
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
         wvl = wavelength_um
         coeff = coefficient
         n_squared = coeff[0] + \
@@ -162,3 +162,49 @@ class BaMgF4(CrystalData):
             (coeff[3] * wvl**2 /(wvl**2 - coeff[4])) + \
             (coeff[5] * wvl**2)
         return n_squared
+
+
+
+    
+# -----------------
+class SiO2(CrystalData):
+    def __init__(self):
+        self.name = "SiO2"
+        self.crystal_system = "trigonal"
+        self.axiality = self.get_axiality()
+        self.point_group = "32"
+        d_11, d_14 = symbols("d_11 d_14")
+        self.d_matrix = lambda kleinmann=True: Matrix([
+            [d_11, -d_11, 0, d_14, 0, 0],
+            [0, 0, 0, 0, -d_14,  d_11],
+            [0, 0, 0, 0, 0, 0]
+        ]) if not kleinmann else Matrix([
+            [d_11, -d_11, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0,  d_11],
+            [0, 0, 0, 0, 0, 0]
+        ])
+
+        self.sellmeier = {"o": [1, 0.28604141, 1.07044083, 1.00585997e-2, 1.10202242, 100],
+                          "e": [1, 0.28851804, 1.09509924, 1.02101864e-2, 1.15662475, 100],
+                          "range" : [0.198, 2.05]} 
+        
+        self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-7000?formula=SiO2",
+                          "refractive_index": "https://doi.org/10.1364/OE.17.012362https://refractiveindex.info/?shelf=main&book=SiO2&page=Ghosh-o"
+        }
+        
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
+        wvl = wavelength_um
+        coeff = coefficient
+        n_squared = coeff[0] + \
+            coeff[1] + \
+            (coeff[2] * wvl**2 /(wvl**2 - coeff[3])) + \
+            (coeff[4] * wvl**2 /(wvl**2 - coeff[5]))
+        return n_squared
+"""
+registered crystal list
+"""
+CRYSTALS = {
+    "LiNbO3": LiNbO3,
+    "BaMgF4": BaMgF4,
+    "SiO2": SiO2
+}
