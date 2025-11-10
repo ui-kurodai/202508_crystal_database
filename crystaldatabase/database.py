@@ -200,11 +200,51 @@ class SiO2(CrystalData):
             (coeff[2] * wvl**2 /(wvl**2 - coeff[3])) + \
             (coeff[4] * wvl**2 /(wvl**2 - coeff[5]))
         return n_squared
+    
+
+
+    
+# -----------------
+class KH2PO4(CrystalData):
+    def __init__(self):
+        self.name = "KH2PO4"
+        self.crystal_system = "tetragonal"
+        self.axiality = self.get_axiality()
+        self.point_group = "42m"
+        d_14, d_36 = symbols("d_14 d_36")
+        self.d_matrix = lambda kleinmann=True: Matrix([
+            [0, 0, 0, d_14, 0, 0],
+            [0, 0, 0, 0, d_14, 0],
+            [0, 0, 0, 0, 0, d_36]
+        ]) if not kleinmann else Matrix([
+            [0, 0, 0, d_14, 0, 0],
+            [0, 0, 0, 0, d_14, 0],
+            [0, 0, 0, 0, 0, d_14]
+        ])
+
+        self.sellmeier = {"o": [2.259276, 13.00522, 400, 0.01008956, 0.0129426],
+                          "e": [2.132668, 3.2279924, 400, 0.008637494, 0.0122810],
+                          "range" : [0.214, 1.53]} 
+        
+        self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-696752?formula=KH2PO4",
+                          "refractive_index": "https://doi.org/10.1364/OE.17.012362https://refractiveindex.info/?shelf=main&book=SiO2&page=Ghosh-o"
+        }
+        
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
+        wvl = wavelength_um
+        coeff = coefficient
+        n_squared = coeff[0] + \
+            (coeff[1] * wvl**2 /(wvl**2 - coeff[2])) + \
+            (coeff[3] * wvl**2 /(wvl**2 - coeff[4]))
+        return n_squared
+
+
 """
 registered crystal list
 """
 CRYSTALS = {
     "LiNbO3": LiNbO3,
     "BaMgF4": BaMgF4,
-    "SiO2": SiO2
+    "SiO2": SiO2,
+    "KH2PO4": KH2PO4
 }
