@@ -27,14 +27,17 @@ class CrystalData(ABC):
             raise ValueError(f"Unknown crystal system: {system}")
 
 
-    def get_n(self, wavelength_nm, polarization='unpolarized'):
+    def get_n(self, wavelength_nm, polarization='unpolarized', ref=None):
         """
         parameters
-        wavelength_nm
+        ----------------------
+        wavelength_nm: float
         polarization:
             "iso",
             "o", "e", degree (float), 
             "a", "b", "c", {axis: a or b or c, degree: (float)}
+        ref:
+            None (as default) or a key string to choose a Sellmeier set.
         """
         wvl = wavelength_nm / 1e3  # μm
         range_min = self.sellmeier["range"][0]
@@ -222,20 +225,35 @@ class KH2PO4(CrystalData):
             [0, 0, 0, 0, 0, d_14]
         ])
 
+        # self.sellmeier = {
+        #     "Zernike_1964":{
+        #         "o": [2.259276, 13.00522, 400, 0.01008956, 0.0129426],
+        #         "e": [2.132668, 3.2279924, 400, 0.008637494, 0.0122810],
+        #         "range" : [0.214, 1.53]
+        #     },
+        #     "Lili_2013":{
+        #         "o": [2.25881, 11.86370, 400, 0.01041, 0.01209],
+        #         "e": [2.13338, 2.93795, 400, 0.00873, 0.01203],
+        #         "range" : [0.254, 1.530]
+        #     }
+        # }
+
         # "https://refractiveindex.info/?shelf=main&book=KH2PO4&page=Zernike-o"
-        # self.sellmeier = {"o": [2.259276, 13.00522, 400, 0.01008956, 0.0129426],
-        #                   "e": [2.132668, 3.2279924, 400, 0.008637494, 0.0122810],
-        #                   "range" : [0.214, 1.53]} 
+        self.sellmeier = {"o": [2.259276, 13.00522, 400, 0.01008956, 0.0129426],
+                          "e": [2.132668, 3.2279924, 400, 0.008637494, 0.0122810],
+                          "range" : [0.214, 1.53]} 
 
         # https://doi.org/10.1063/1.4832225
-        self.sellmeier = {"o": [2.25881, 11.86370, 400, 0.01041, 0.01209],
-                          "e": [2.13338, 2.93795, 400, 0.00873, 0.01203],
-                          "range" : [0.254, 1.530]} 
+        # self.sellmeier = {"o": [2.25881, 11.86370, 400, 0.01041, 0.01209],
+        #                   "e": [2.13338, 2.93795, 400, 0.00873, 0.01203],
+        #                   "range" : [0.254, 1.530]} 
         
         
         self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-696752?formula=KH2PO4",
-                          "refractive_index": ["https://refractiveindex.info/?shelf=main&book=KH2PO4&page=Zernike-o",
-                                               "https://doi.org/10.1063/1.4832225"]
+                          "refractive_index": {
+                              "Zernike_1964": "https://refractiveindex.info/?shelf=main&book=KH2PO4&page=Zernike-o",
+                              "Lili_2013": "https://doi.org/10.1063/1.4832225"
+                          }
         }
         
     def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
