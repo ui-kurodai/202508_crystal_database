@@ -266,6 +266,54 @@ class KH2PO4(CrystalData):
         return n_squared
 
 
+
+
+
+
+
+# -----------------
+class SrAlF5(CrystalData):
+    def __init__(self):
+        self.name = "SrAlF5"
+        self.crystal_system = "tetragonal"
+        self.axiality = self.get_axiality()
+        self.point_group = "4"
+        d_31, d_33, d_14, d_15 = symbols("d_31 d_33 d_14 d_15")
+        self.d_matrix = lambda kleinmann=True: Matrix([
+            [0, 0, 0, d_14, d_15, 0],
+            [0, 0, 0, d_15, -d_14, 0],
+            [d_31, d_31, d_33, 0, 0, 0]
+        ]) if not kleinmann else Matrix([
+            [0, 0, 0, 0, d_31, 0],
+            [0, 0, 0, d_31, 0, 0],
+            [d_31, d_31, d_33, 0, 0, 0]
+        ])
+
+        # for IR region this is better
+        # self.sellmeier = {"o": [1, 1.0036, 59.6e-4],
+        #                   "e": [1, 1.0060, 56.3e-4],
+        #                   "range" : [0.1849, 1.083]} 
+
+        # for UV region this is better
+        self.sellmeier = {"o": [2.022, -0.028, 0.0014, 0.45e-3, -1.8e-5, 0.28e-6, 0.012],
+                          "e": [2.044, -0.056, -0.004, 1.1e-3, -4.8e-5, 0.8e-6, 0.024],
+                          "range" : [0.17, 1.2]}
+        
+        self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-540653",
+                          "refractive_index": "https://doi.org/10.1016/j.jcrysgro.2005.03.029"
+        }
+        
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
+        wvl = wavelength_um
+        coeff = coefficient
+        n_squared = coeff[0] + \
+            coeff[1] * wvl**2 + \
+            coeff[2] / wvl**2 + \
+            coeff[3] / wvl**4 + \
+            coeff[4] / wvl**6 + \
+            coeff[5] / wvl**8 + \
+            coeff[6] * wvl**4
+        return n_squared
 """
 registered crystal list
 """
@@ -273,5 +321,6 @@ CRYSTALS = {
     "LiNbO3": LiNbO3,
     "BaMgF4": BaMgF4,
     "SiO2": SiO2,
-    "KH2PO4": KH2PO4
+    "KH2PO4": KH2PO4,
+    "SrAlF5": SrAlF5
 }
