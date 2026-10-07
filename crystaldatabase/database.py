@@ -314,6 +314,73 @@ class SrAlF5(CrystalData):
             coeff[5] / wvl**8 + \
             coeff[6] * wvl**4
         return n_squared
+
+
+
+
+# -----------------
+class BaF2(CrystalData):
+    def __init__(self):
+        self.name = "BaF2"
+        self.crystal_system = "cubic"
+        self.axiality = self.get_axiality()
+        self.point_group = "m-3m"
+        self.d_matrix = np.NaN
+
+        self.sellmeier = {"iso": [1.33973, 0.81070, 0.10065, 0.19652, 29.87, 4.52469, 53.82],
+                          "range" : [0.15, 15]}
+        
+        self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-1029",
+                          "refractive_index": "https://doi.org/10.1063/1.555616"
+        }
+        
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
+        wvl = wavelength_um
+        coeff = coefficient
+        n_squared = coeff[0] + \
+                    (coeff[1] * wvl**2 /(wvl**2 - coeff[2]**2)) + \
+                    (coeff[3] * wvl**2 /(wvl**2 - coeff[4]**2)) + \
+                    (coeff[5] * wvl**2 /(wvl**2 - coeff[6]**2))
+        return n_squared
+
+    
+
+
+
+
+# -----------------
+class MgF2(CrystalData):
+    def __init__(self):
+        self.name = "MgF2"
+        self.crystal_system = "tetragonal"
+        self.axiality = self.get_axiality()
+        self.point_group = "4/mmm"
+        self.d_matrix = np.NaN
+
+        self.sellmeier = {"o": [1.27620, 0.60967, 0.08636, 0.0080, 18.0, 2.14973, 25.0],
+                          "e": [1.25385, 0.66405, 0.08504, 1.0899, 22.2, 0.1816, 24.4, 2.1227, 40.6],
+                          "range" : [0.14, 7.5]}
+        
+        self.reference = {"crystal_system": "https://next-gen.materialsproject.org/materials/mp-1249",
+                          "refractive_index": "https://doi.org/10.1063/1.555616"
+        }
+        
+    def _sellmeier_eq(self, wavelength_um, coefficient, polarization="independent"):
+        wvl = wavelength_um
+        coeff = coefficient
+        
+        if polarization == "o":
+            n_squared = coeff[0] + \
+                (coeff[1] * wvl**2 /(wvl**2 - coeff[2]**2)) + \
+                (coeff[3] * wvl**2 /(wvl**2 - coeff[4]**2)) + \
+                (coeff[5] * wvl**2 /(wvl**2 - coeff[6]**2))
+        elif polarization == "e":
+            n_squared = coeff[0] + \
+                (coeff[1] * wvl**2 /(wvl**2 - coeff[2]**2)) + \
+                (coeff[3] * wvl**2 /(wvl**2 - coeff[4]**2)) + \
+                (coeff[5] * wvl**2 /(wvl**2 - coeff[6]**2)) + \
+                (coeff[7] * wvl**2 /(wvl**2 - coeff[8]**2))
+        return n_squared
 """
 registered crystal list
 """
@@ -322,5 +389,7 @@ CRYSTALS = {
     "BaMgF4": BaMgF4,
     "SiO2": SiO2,
     "KH2PO4": KH2PO4,
+    "BaF2": BaF2,
+    "MgF2": MgF2,
     "SrAlF5": SrAlF5
 }
