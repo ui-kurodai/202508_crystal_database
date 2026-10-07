@@ -57,8 +57,8 @@ class CrystalData(ABC):
         elif self.axiality =="uniaxial":
             coeff_o = self.sellmeier["o"]
             coeff_e = self.sellmeier["e"]
-            n_o_squared = self._sellmeier_eq(wvl, coeff_o)
-            n_e_squared = self._sellmeier_eq(wvl, coeff_e)
+            n_o_squared = self._sellmeier_eq(wvl, coeff_o, polarization="o")
+            n_e_squared = self._sellmeier_eq(wvl, coeff_e, polarization="e")
             n_o = np.sqrt(n_o_squared)
             n_e = np.sqrt(n_e_squared)
 
@@ -380,6 +380,8 @@ class MgF2(CrystalData):
                 (coeff[3] * wvl**2 /(wvl**2 - coeff[4]**2)) + \
                 (coeff[5] * wvl**2 /(wvl**2 - coeff[6]**2)) + \
                 (coeff[7] * wvl**2 /(wvl**2 - coeff[8]**2))
+        else:
+            raise ValueError(f"Polarization for MgF2 must be 'o' or 'e': {polarization}")
         return n_squared
 """
 registered crystal list
