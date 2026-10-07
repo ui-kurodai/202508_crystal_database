@@ -325,7 +325,7 @@ class BaF2(CrystalData):
         self.crystal_system = "cubic"
         self.axiality = self.get_axiality()
         self.point_group = "m-3m"
-        self.d_matrix = np.NaN
+        self.d_matrix = 0
 
         self.sellmeier = {"iso": [1.33973, 0.81070, 0.10065, 0.19652, 29.87, 4.52469, 53.82],
                           "range" : [0.15, 15]}
@@ -355,7 +355,7 @@ class MgF2(CrystalData):
         self.crystal_system = "tetragonal"
         self.axiality = self.get_axiality()
         self.point_group = "4/mmm"
-        self.d_matrix = np.NaN
+        self.d_matrix = 0
 
         self.sellmeier = {"o": [1.27620, 0.60967, 0.08636, 0.0080, 18.0, 2.14973, 25.0],
                           "e": [1.25385, 0.66405, 0.08504, 1.0899, 22.2, 0.1816, 24.4, 2.1227, 40.6],
