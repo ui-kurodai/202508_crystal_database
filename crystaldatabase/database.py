@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import warnings
 import numpy as np
 from sympy import symbols, Matrix
 
@@ -27,7 +28,8 @@ class CrystalData(ABC):
             raise ValueError(f"Unknown crystal system: {system}")
 
 
-    def get_n(self, wavelength_nm, polarization='unpolarized', ref=None):
+    def get_n(self, wavelength_nm, polarization='unpolarized', ref=None,
+              *, allow_extrapolation=False):
         """
         parameters
         ----------------------
@@ -38,12 +40,22 @@ class CrystalData(ABC):
             "a", "b", "c", {axis: a or b or c, degree: (float)}
         ref:
             None (as default) or a key string to choose a Sellmeier set.
+        allow_extrapolation: bool
+            If True, calculate outside the approximation range with a UserWarning.
+            If False (default), raise ValueError outside the range.
         """
         wvl = wavelength_nm / 1e3  # μm
         range_min = self.sellmeier["range"][0]
         range_max = self.sellmeier["range"][1]
         if wvl < range_min or wvl > range_max:
-            raise ValueError(f"Wavelength out of approximation range: {range_min}-{range_max} um")
+            if not allow_extrapolation:
+                raise ValueError(f"Wavelength out of approximation range: {range_min}-{range_max} um")
+            warnings.warn(
+                f"{self.name}: wavelength {wvl:g} um is outside the "
+                f"approximation range [{range_min:g}, {range_max:g}] um.",
+                UserWarning,
+                stacklevel=2,
+            )
         # n_squared = 1 + self.constant
         # for A, B in self.coefficients:
         #     n_squared += A * λ**2 / (λ**2 - B)
